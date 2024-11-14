@@ -1,0 +1,21 @@
+# Ignore node modules folder
+node_modules/
+
+# Ignore environment variables file
+.env
+
+# Ignore build directories (optional)
+dist/
+build/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore package lock files (optional)
+package-lock.json
+yarn.lock

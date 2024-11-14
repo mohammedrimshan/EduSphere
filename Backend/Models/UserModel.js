@@ -16,17 +16,26 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: true,
-      unique: true
+      required: function() { return !this.googleId; }, // Only required if not Google auth
+      unique: true,
+      sparse: true // Allows multiple null values
     },
     password: {
       type: String,
-      required: true
+      required: function() { return !this.googleId; }, // Only required if not Google auth
     },
     user_id: {
       type: String,
       required: true,
       unique: true
+    },
+    googleId: {
+      type: String,
+      default: null,
+    },
+    profileImage: {
+      type: String,
+      default: null,
     },
     image: {
       type: String,
@@ -61,5 +70,6 @@ const userSchema = new mongoose.Schema(
 userSchema.index({ email: 1 });
 userSchema.index({ phone: 1 });
 userSchema.index({ user_id: 1 });
+userSchema.index({ googleId: 1 });
 
 module.exports = mongoose.model("User", userSchema);
