@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import { toast } from "react-toastify";
 import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/user";
+const API_BASE_URL = "http://localhost:5000/user";
 
 const OtpModal = ({ isOpen, onClose, onVerify, email }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -50,7 +50,7 @@ const OtpModal = ({ isOpen, onClose, onVerify, email }) => {
       setIsResending(true);
       const response = await axios.post(`${API_BASE_URL}/resend-otp`, { email });
       if (response.data.message === "OTP resent successfully") {
-        toast.success("OTP resent successfully");
+        toast.success("New OTP sent successfully");
         setTimer(60);
         setOtp(["", "", "", "", "", ""]);
       } else {

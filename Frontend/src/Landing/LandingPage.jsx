@@ -20,30 +20,23 @@ import USER1 from "../assets/User1.jpg";
 import Tutor from "../assets/Tutor.svg";
 import Student from "../assets/Student.svg";
 import Banner2 from "../assets/Banner2.svg";
-const Button = ({ children, className, variant }) => {
-  const baseStyle = "px-4 py-2 rounded-full font-medium";
-  const variantStyles = {
-    default: "bg-green-500 text-white hover:bg-green-600",
-    outline: "border border-current hover:bg-white hover:text-gray-900",
-  };
-  return (
-    <button
-      className={`${baseStyle} ${
-        variantStyles[variant] || variantStyles.default
-      } ${className}`}
-    >
-      {children}
-    </button>
-  );
-};
+import { useNavigate } from "react-router-dom";
+import Button from '../ui/Button'
+import Card from '../ui/Card'
 
-const Card = ({ children, className }) => {
-  return (
-    <div className={`bg-white rounded-xl shadow ${className}`}>{children}</div>
-  );
-};
 
 export default function App() {
+
+  const navigate = useNavigate();  
+
+  const handleRegister = () => {
+    navigate("/register");  
+  };
+
+  const handleLogin =()=>{
+    navigate('/login')
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
@@ -72,7 +65,7 @@ export default function App() {
               Tutors
             </a>
           </nav>
-          <Button className="ml-6">LOGIN</Button>
+          <Button className="ml-6" onClick={handleLogin}>LOGIN</Button>
         </div>
       </header>
 
@@ -91,8 +84,8 @@ export default function App() {
                 learning goals as they progress through a journey.
               </p>
               <div className="flex gap-4">
-                <Button variant="outline">Register</Button>
-                <Button>LOGIN</Button>
+                <Button variant="outline" onClick={handleRegister}>Register</Button>
+                <Button onClick={handleLogin}>LOGIN</Button>
               </div>
             </div>
             <div className="relative">
@@ -460,7 +453,7 @@ export default function App() {
               dropshipping and custom products.
             </p>
             <div className="flex gap-4 justify-center">
-              <Button>Register</Button>
+              <Button onClick={handleRegister}>Register</Button>
               <Button variant="outline" className="text-white border-white">
                 Contact Us
               </Button>

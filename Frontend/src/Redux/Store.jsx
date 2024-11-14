@@ -1,16 +1,10 @@
-// store.js
-import { configureStore } from '@reduxjs/toolkit';
-import userReducer from './Slices/userSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import userReducer from "./Slices/userSlice"; 
 
-export const store = configureStore({
+const store = configureStore({
   reducer: {
     user: userReducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        // Ignore these action types
-        ignoredActions: ['user/register/fulfilled', 'user/login/fulfilled'],
-      },
-    }),
 });
+
+export default store;

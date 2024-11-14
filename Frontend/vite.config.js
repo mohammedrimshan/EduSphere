@@ -6,10 +6,10 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, './src'), // Alias for the src folder
     },
   },
   define: {
-    'process.env': {}  // Polyfill for process.env
+    'process.env': {},  // Polyfill for process.env if needed
   },
 });

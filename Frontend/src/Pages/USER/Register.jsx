@@ -3,9 +3,13 @@ import { Eye, EyeOff } from 'lucide-react';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import { GoogleLogin } from "@react-oauth/google";
 import OtpModal from "../../ui/OTP";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Banner from '../../assets/Register.jpg'
+import Banner from '../../assets/Register.jpg';
+import DotDotDotSpinner from "../../ui/Spinner/DotDotDotSpinner";
+import { loginUser } from "../../Redux/Slices/userSlice";
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/user";
 
 export default function Register() {
@@ -15,6 +19,8 @@ export default function Register() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate(); 
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
@@ -130,13 +136,14 @@ export default function Register() {
 
   const handleVerify = async (otp) => {
     try {
+      setIsSubmitting(true);
       const verifyResponse = await axios.post(`${API_BASE_URL}/verify-otp`, {
         email: formData.email,
         otp: otp
       });
       
       if (verifyResponse.data.message === "OTP verified successfully") {
-        // OTP verified, proceed with registration
+        // Proceed with registration
         const registerResponse = await axios.post(`${API_BASE_URL}/signup`, {
           full_name: formData.full_name,
           email: formData.email,
@@ -146,20 +153,50 @@ export default function Register() {
         
         if (registerResponse.data.message === "User registered successfully") {
           toast.success("Registration successful!");
-          setShowOtpModal(false);
-          // Redirect to login page or dashboard
-          navigate('/login')
+          setTimeout(() => {
+            setShowOtpModal(false);
+            navigate('/login'); // Redirect to login page
+          }, 1500); // Delay to allow the toast to be visible
         } else {
-          toast.error("Registration failed");
+          toast.error("Registration failed. Please try again.");
         }
       } else {
-        toast.error("Invalid OTP");
+        toast.error("Invalid OTP. Please try again.");
       }
     } catch (error) {
       console.error("Verification or registration error:", error.response?.data);
-      toast.error(error.response?.data?.message || "Verification or registration failed");
+      if (error.response?.status === 400 && error.response?.data?.message === "Invalid or expired OTP") {
+        toast.error("OTP has expired. Please request a new one.");
+        // Reset OTP input fields
+        setOtp(["", "", "", "", "", ""]);
+      } else {
+        toast.error(error.response?.data?.message || "Verification failed. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/google`,
+        { token: credentialResponse.credential }
+      );
+      dispatch(loginUser(response.data.user));
+      toast.success("Login successful");
+      localStorage.setItem("token", response.data.token);
+      setTimeout(() => navigate("/home"), 1000);
+    } catch (error) {
+      toast.error("Google login failed");
+      console.error(error);
+    }
+  };
+  
+  const handleGoogleFailure = () => {
+    toast.error("Google login was unsuccessful");
+  };
+
 
   return (
     <div className="min-h-screen flex relative">
@@ -324,18 +361,32 @@ export default function Register() {
                 </a>
               </span>
             </div>
-
+            <p className="text-center text-sm text-gray-600">
+              Already have Account{' '}
+              <a href="/login" className="text-green-500 hover:underline">
+                Sign In !
+              </a>
+            </p>
             <div>
               <button
                 type="submit"
                 className="w-full px-6 py-3 bg-green-500 text-white rounded-lg font-semibold text-lg disabled:opacity-50"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Submitting..." : "Register"}
+                {isSubmitting ? <DotDotDotSpinner />: "Register"}
               </button>
             </div>
           </form>
-
+              {/* Google Login Button */}
+            <div className="mt-6">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleFailure}
+              theme="outline"
+              size="large"
+              width="100%"
+            />
+          </div>
           {showOtpModal && (
             <OtpModal
               isOpen={showOtpModal}
